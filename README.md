@@ -1,6 +1,6 @@
 # Hotel Management System
 
-A comprehensive backend system for hotel management built with Node.js, Express, and SQLite.
+A comprehensive backend system for hotel management built with Node.js, Express, SQLite, and Socket.IO for real-time features.
 
 ## Features
 
@@ -10,7 +10,9 @@ A comprehensive backend system for hotel management built with Node.js, Express,
 - Booking System
 - Payment Processing
 - Service Management
-- Detailed Reporting
+- Real-time Chat System
+- Food Ordering System
+- Real-time Service Requests
 
 ## API Endpoints
 
@@ -63,6 +65,35 @@ A comprehensive backend system for hotel management built with Node.js, Express,
 - GET `/api/services/requests/pending` - Get pending service requests (staff)
 - DELETE `/api/services/:id` - Delete service (admin)
 
+### Food Menu & Orders
+- GET `/api/food/menu` - Get all menu items
+- POST `/api/food/menu` - Add menu item (admin/staff)
+- PUT `/api/food/menu/:id` - Update menu item (admin/staff)
+- GET `/api/food/orders` - Get all food orders
+- GET `/api/food/orders/:id` - Get specific order
+- PUT `/api/food/orders/:id/status` - Update order status (staff)
+- GET `/api/food/menu/categories` - Get menu categories
+
+## Real-time Features
+
+### Socket.IO Events
+
+#### Client to Server
+- `authenticate` - Authenticate user connection
+- `private_message` - Send private message
+- `service_request` - Create service request
+- `food_order` - Place food order
+
+#### Server to Client
+- `authenticated` - Connection authenticated
+- `chat_history` - Receive chat history
+- `new_message` - Receive new message
+- `message_sent` - Message sent confirmation
+- `new_service_request` - New service request notification
+- `service_request_created` - Service request confirmation
+- `new_food_order` - New food order notification
+- `food_order_created` - Food order confirmation
+
 ## Setup
 
 1. Clone the repository
@@ -89,11 +120,33 @@ A comprehensive backend system for hotel management built with Node.js, Express,
 
 The system uses SQLite as the database, which will be automatically created at first run. The database file will be created as `hotel.db` in the root directory.
 
+## Real-time Communication
+
+The system uses Socket.IO for real-time features:
+- Chat between guests and staff
+- Instant service requests
+- Real-time food ordering
+- Live status updates
+
+### Chat System Features
+- Private messaging between guests and staff
+- Service request creation through chat
+- Message history
+- Real-time status updates
+- File sharing support (coming soon)
+
+### Food Ordering System
+- Real-time menu updates
+- Instant order placement
+- Live order status tracking
+- Special requests handling
+- Order history
+
 ## User Roles
 
 - **Admin**: Full access to all features
-- **Staff**: Access to service management and basic operations
-- **User**: Basic access for viewing rooms and making bookings
+- **Staff**: Access to service management, chat, and basic operations
+- **Guest**: Access to chat, food ordering, and service requests
 
 ## Authentication
 
@@ -128,6 +181,8 @@ npm install --save-dev nodemon
 4. Regular database backups
 5. Input validation and sanitization
 6. Proper error logging
+7. Socket.IO authentication
+8. Message encryption (coming soon)
 
 ## License
 
