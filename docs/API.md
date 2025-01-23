@@ -673,3 +673,230 @@ Response includes pagination metadata:
         "itemsPerPage": 20
     }
 }
+
+## Error Handling
+
+### HTTP Status Codes
+
+| Status Code | Description | Example Scenarios |
+|------------|-------------|-------------------|
+| 200 | OK | Successful GET, PUT requests |
+| 201 | Created | Successful POST requests |
+| 400 | Bad Request | Invalid input, validation errors |
+| 401 | Unauthorized | Missing or invalid token |
+| 403 | Forbidden | Insufficient permissions |
+| 404 | Not Found | Resource doesn't exist |
+| 409 | Conflict | Duplicate entry |
+| 429 | Too Many Requests | Rate limit exceeded |
+| 500 | Internal Server Error | Server-side errors |
+
+### Common Error Responses
+
+1. **Validation Error (400)**
+```json
+{
+    "error": "Validation failed",
+    "details": {
+        "field": "email",
+        "message": "Invalid email format"
+    }
+}
+```
+
+2. **Authentication Error (401)**
+```json
+{
+    "error": "Access token is required"
+}
+```
+
+3. **Permission Error (403)**
+```json
+{
+    "error": "User not authorized for this action",
+    "requiredRole": "admin"
+}
+```
+
+4. **Resource Not Found (404)**
+```json
+{
+    "error": "Resource not found",
+    "resource": "booking",
+    "id": "123"
+}
+```
+
+5. **Rate Limit Error (429)**
+```json
+{
+    "error": "Too many requests",
+    "retryAfter": 60,
+    "limit": "100 requests per minute"
+}
+```
+
+## Rate Limiting
+
+### Limits by Route Type
+
+| Route Type | Authenticated | Unauthenticated |
+|------------|---------------|-----------------|
+| GET requests | 100/minute | 20/minute |
+| POST requests | 50/minute | 10/minute |
+| PUT/DELETE requests | 30/minute | Not allowed |
+
+### Rate Limit Headers
+
+Response headers include rate limit information:
+```
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1706025600
+```
+
+### Burst Handling
+
+Short bursts of requests are allowed within reasonable limits:
+- Up to 20 requests in 1 second
+- Up to 50 requests in 10 seconds
+- Regular limits apply for longer periods
+
+## Pagination
+
+### Request Parameters
+
+All list endpoints support the following pagination parameters:
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| page | integer | 1 | Page number |
+| limit | integer | 10 | Items per page (max: 100) |
+| sort | string | id | Field to sort by |
+| order | string | desc | Sort order (asc/desc) |
+
+### Example Request
+```http
+GET /api/bookings?page=2&limit=20&sort=check_in_date&order=desc
+```
+
+### Response Format
+```json
+{
+    "data": [...],
+    "pagination": {
+        "currentPage": 2,
+        "totalPages": 5,
+        "totalItems": 100,
+        "itemsPerPage": 20,
+        "hasNextPage": true,
+        "hasPrevPage": true
+    },
+    "links": {
+        "first": "/api/bookings?page=1&limit=20",
+        "prev": "/api/bookings?page=1&limit=20",
+        "next": "/api/bookings?page=3&limit=20",
+        "last": "/api/bookings?page=5&limit=20"
+    }
+}
+```
+
+## Database Schema
+
+### Tables Overview
+
+1. **Users**
+```sql
+CREATE TABLE users (
+    user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    role TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+2. **Chat Messages**
+```sql
+CREATE TABLE chat_messages (
+    message_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sender_id INTEGER NOT NULL,
+    sender_type TEXT NOT NULL,
+    receiver_id INTEGER NOT NULL,
+    receiver_type TEXT NOT NULL,
+    message TEXT NOT NULL,
+    message_type TEXT DEFAULT 'text',
+    status TEXT DEFAULT 'sent',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+3. **Service Requests**
+```sql
+CREATE TABLE chat_service_requests (
+    request_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    message_id INTEGER NOT NULL,
+    service_type TEXT NOT NULL,
+    status TEXT DEFAULT 'pending',
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (message_id) REFERENCES chat_messages(message_id)
+);
+```
+
+4. **Food Menu**
+```sql
+CREATE TABLE food_menu (
+    item_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    description TEXT,
+    price DECIMAL NOT NULL,
+    category TEXT NOT NULL,
+    availability BOOLEAN DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Relationships
+
+```mermaid
+erDiagram
+    USERS ||--o{ CHAT_MESSAGES : sends
+    CHAT_MESSAGES ||--o{ CHAT_SERVICE_REQUESTS : creates
+    BOOKINGS ||--o{ FOOD_ORDERS : places
+    FOOD_MENU ||--o{ FOOD_ORDER_ITEMS : contains
+```
+
+## API Versioning
+
+The API uses URL versioning. Current version: v1
+```
+http://localhost:3000/api/v1/
+```
+
+Future versions will be available at `/api/v2/`, etc.
+
+### Version Lifecycle
+
+| Version | Status | End of Life |
+|---------|--------|-------------|
+| v1 | Current | Active |
+| v2 | Planning | - |
+
+### Deprecation Policy
+
+- 6 months notice before deprecating any API version
+- Deprecated versions remain available for 3 months
+- Security updates only during deprecation period
+
+## Testing
+
+### Running Tests
+```bash
+npm test
+```
+
+### Coverage Report
+```bash
+npm run test:coverage
+```
