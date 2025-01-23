@@ -673,6 +673,7 @@ Response includes pagination metadata:
         "itemsPerPage": 20
     }
 }
+```
 
 ## Error Handling
 
