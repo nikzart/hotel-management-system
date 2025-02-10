@@ -5,6 +5,13 @@ set -e
 
 # Configuration
 APP_DIR="/var/www/hotel-system"
+LOG_DIR="/var/log/hotel-system"
+
+# Check for root privileges
+if [ "$EUID" -ne 0 ]; then 
+    echo "Please run as root (sudo)"
+    exit 1
+fi
 
 # Check if application directory exists
 if [ ! -d "$APP_DIR" ]; then
@@ -15,24 +22,25 @@ fi
 # Print status message
 echo "Starting update process..."
 
-# Navigate to app directory
-cd $APP_DIR
+# Ensure log directory exists with proper permissions
+echo "Checking log directory..."
+mkdir -p $LOG_DIR
+chown -R $SUDO_USER:$SUDO_USER $LOG_DIR
 
-# Stash any local changes
-echo "Stashing any local changes..."
-git stash
+# Navigate to app directory and update as the correct user
+echo "Pulling latest changes..."
+su - $SUDO_USER -c "cd $APP_DIR && git stash && git pull origin main"
 
-# Pull latest changes
-echo "Pulling latest changes from main branch..."
-git pull origin main
-
-# Install dependencies
+# Install dependencies as the correct user
 echo "Updating dependencies..."
-npm install --production
+su - $SUDO_USER -c "cd $APP_DIR && npm install --production"
 
-# Restart the service
-echo "Restarting service..."
-sudo systemctl restart hotel-system
+# Restart the services
+echo "Restarting services..."
+systemctl restart hotel-system
+systemctl restart nginx
 
 echo "Update completed successfully!"
-echo "Check status with: sudo systemctl status hotel-system"
+echo "Check application status with: systemctl status hotel-system"
+echo "Check nginx status with: systemctl status nginx"
+echo "View logs with: tail -f $LOG_DIR/app.log"
