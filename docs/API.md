@@ -11,8 +11,35 @@
 8. [Real-time Features](#real-time-features)
 
 ## Base URL
+
+### Development
 ```
 http://localhost:3000/api
+```
+
+### Production
+Configure your production base URL in the Nginx configuration:
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;  # Replace with your actual domain
+
+    location /api {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+```
+
+After configuration and SSL setup, your production base URL will be:
+```
+https://your-domain.com/api
 ```
 
 ## Authentication

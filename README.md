@@ -165,12 +165,64 @@ npm run dev
 
 ## Production Deployment
 
-1. Update environment variables
-2. Set NODE_ENV to 'production'
-3. Use process manager (e.g., PM2)
-4. Enable HTTPS
-5. Set up database backups
-6. Configure logging
+The system comes with a deployment script that automates the setup process on Ubuntu/Debian systems.
+
+### Prerequisites
+- Ubuntu/Debian server
+- Root access / sudo privileges
+
+### Automated Deployment
+1. Connect to your server via SSH
+2. Clone the repository
+3. Run the deployment script:
+```bash
+sudo ./deploy.sh
+```
+
+The script will:
+- Install required packages (nginx, nodejs, npm, mongodb)
+- Set up the application directory at `/var/www/hotel-system`
+- Configure Nginx as a reverse proxy
+- Create and configure a systemd service
+- Set up MongoDB
+- Configure logging at `/var/log/hotel-system`
+
+### Post-Deployment Steps
+1. Update the environment variables:
+```bash
+sudo nano /var/www/hotel-system/.env
+```
+
+2. Configure your domain in Nginx:
+```bash
+sudo nano /etc/nginx/sites-available/hotel-system
+```
+
+3. Set up SSL (recommended):
+```bash
+sudo apt-get install certbot python3-certbot-nginx
+sudo certbot --nginx
+```
+
+### Monitoring and Management
+- Check application status:
+```bash
+systemctl status hotel-system
+```
+- View application logs:
+```bash
+journalctl -u hotel-system
+```
+- Restart the application:
+```bash
+sudo systemctl restart hotel-system
+```
+
+### Additional Configuration
+1. Set up database backups
+2. Configure log rotation
+3. Set up monitoring (e.g., with Prometheus/Grafana)
+4. Configure firewall rules
 
 ## Contributing
 
