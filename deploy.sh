@@ -18,10 +18,14 @@ fi
 # Print status message
 echo "Starting deployment..."
 
+# Add NodeSource repository for Node.js
+echo "Adding NodeSource repository..."
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+
 # Install required packages if not present
 echo "Checking and installing required packages..."
 apt-get update
-apt-get install -y nginx nodejs npm
+apt-get install -y nginx nodejs
 
 # Create log directory
 echo "Setting up log directory..."
