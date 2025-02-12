@@ -25,7 +25,7 @@ curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 # Install required packages if not present
 echo "Checking and installing required packages..."
 apt-get update
-apt-get install -y nginx nodejs
+apt-get install -y nginx nodejs build-essential python3 make g++ python3-dev
 
 # Create log directory
 echo "Setting up log directory..."
