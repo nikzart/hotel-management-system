@@ -21,7 +21,7 @@ echo "Starting deployment..."
 # Install required packages if not present
 echo "Checking and installing required packages..."
 apt-get update
-apt-get install -y nginx nodejs npm mongodb
+apt-get install -y nginx nodejs npm
 
 # Create log directory
 echo "Setting up log directory..."
@@ -87,7 +87,7 @@ echo "Creating systemd service..."
 cat > /etc/systemd/system/hotel-system.service <<EOL
 [Unit]
 Description=Hotel Management System
-After=network.target mongodb.service
+After=network.target mongod.service
 
 [Service]
 Type=simple
@@ -104,8 +104,8 @@ EOL
 
 # Setup MongoDB
 echo "Ensuring MongoDB is running..."
-systemctl enable mongodb
-systemctl start mongodb
+systemctl enable mongod
+systemctl start mongod
 
 # Reload systemd and restart services
 echo "Restarting services..."
