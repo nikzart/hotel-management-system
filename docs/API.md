@@ -213,6 +213,25 @@ PUT /rooms/:id
 }
 ```
 
+### Delete Room (Admin Only)
+```http
+DELETE /rooms/:id
+```
+
+**Response (200):**
+```json
+{
+    "message": "Room deleted successfully"
+}
+```
+
+**Error Response (400):**
+```json
+{
+    "error": "Cannot delete room with active bookings"
+}
+```
+
 ## Guests
 
 ### List All Guests
@@ -314,6 +333,25 @@ GET /guests/search/query?term=john
 ]
 ```
 
+### Delete Guest (Admin Only)
+```http
+DELETE /guests/:id
+```
+
+**Response (200):**
+```json
+{
+    "message": "Guest deleted successfully"
+}
+```
+
+**Error Response (400):**
+```json
+{
+    "error": "Cannot delete guest with existing bookings"
+}
+```
+
 ## Bookings
 
 ### Create Booking
@@ -391,6 +429,25 @@ PUT /bookings/:id/status
 ```json
 {
     "message": "Booking status updated successfully"
+}
+```
+
+### Delete Booking (Admin Only)
+```http
+DELETE /bookings/:id
+```
+
+**Response (200):**
+```json
+{
+    "message": "Booking deleted successfully"
+}
+```
+
+**Error Response (400):**
+```json
+{
+    "error": "Cannot delete booking with existing payments"
 }
 ```
 
@@ -481,6 +538,25 @@ GET /services/requests/pending
         "notes": "Extra towels needed"
     }
 ]
+```
+
+### Delete Service (Admin Only)
+```http
+DELETE /services/:id
+```
+
+**Response (200):**
+```json
+{
+    "message": "Service deleted successfully"
+}
+```
+
+**Response (200) - When service has existing requests:**
+```json
+{
+    "message": "Service marked as inactive due to existing requests"
+}
 ```
 
 ## Food Menu & Orders
